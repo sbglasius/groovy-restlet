@@ -3,10 +3,11 @@
  */
 package org.lpny.gr.builder;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.codehaus.groovy.control.CompilationFailedException;
-import org.restlet.Component;
+import org.lpny.gr.Constructor;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -14,7 +15,7 @@ import org.testng.annotations.Test;
  * 
  */
 public class BasicBuilderTest {
-    private BuilderTester tester;
+    private Constructor constructor;
 
     /**
      * @throws IOException
@@ -24,14 +25,14 @@ public class BasicBuilderTest {
     @Test(groups = { "unittest", "builder" })
     public final void createComponent() throws CompilationFailedException,
             IOException {
-        final Component result = (Component) tester
-                .runScript(BuilderTester.TEST_SCRIPT_ROOT
-                        + "/org/lpny/gr/builder/BuildComponent.groovy");
-        assert result != null;
+        constructor
+                .build(new File(BuilderTester.TEST_SCRIPT_ROOT
+                        + "/org/lpny/gr/builder/BuildComponent.groovy").toURI()
+                        .toURL());
     }
 
     @BeforeClass(groups = { "unittest" })
     public void setUp() {
-        tester = new BuilderTester(new Builder());
+        constructor = new Constructor();
     }
 }

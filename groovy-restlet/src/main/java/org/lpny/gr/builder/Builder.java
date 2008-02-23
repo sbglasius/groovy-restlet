@@ -5,7 +5,8 @@ package org.lpny.gr.builder;
 
 import groovy.util.FactoryBuilderSupport;
 
-import org.restlet.Component;
+import org.lpny.gr.builder.factory.ApplicationFactory;
+import org.lpny.gr.builder.factory.ComponentFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +28,7 @@ public class Builder extends FactoryBuilderSupport {
     }
 
     private void registerFactories() {
-        registerBeanFactory("component", Component.class);
+        registerFactory("component", new ComponentFactory());
+        registerFactory("application", new ApplicationFactory());
     }
 }
