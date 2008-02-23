@@ -7,6 +7,7 @@ import groovy.util.FactoryBuilderSupport;
 
 import org.lpny.gr.builder.factory.ApplicationFactory;
 import org.lpny.gr.builder.factory.ComponentFactory;
+import org.lpny.gr.builder.factory.RestletFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,5 +31,6 @@ public class Builder extends FactoryBuilderSupport {
     private void registerFactories() {
         registerFactory("component", new ComponentFactory());
         registerFactory("application", new ApplicationFactory());
+        registerFactory("restlet", new RestletFactory());
     }
 }

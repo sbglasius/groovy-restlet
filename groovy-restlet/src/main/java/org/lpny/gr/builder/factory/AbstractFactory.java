@@ -45,7 +45,9 @@ public abstract class AbstractFactory extends groovy.util.AbstractFactory {
             throws InstantiationException, IllegalAccessException {
         Validate.notNull(name);
         filterAttributes(builder.getContext(), attributes);
-        Object result = tryCreatingBySpringContext(builder);
+        Object result = SpringFinder.createFromSpringContext(
+                (ApplicationContext) builder.getVariable("springContext"),
+                builder.getContext());
         if (result == null) {
             result = newInstanceInner(builder, name, value, attributes);
         }
@@ -72,14 +74,6 @@ public abstract class AbstractFactory extends groovy.util.AbstractFactory {
         super.setParent(builder, parent, child);
     }
 
-    private void filterAttributes(final Map context, final Map attributes) {
-        for (final String key : filters) {
-            if (attributes.containsKey(key)) {
-                context.put(key, attributes.remove(key));
-            }
-        }
-    }
-
     /**
      * 
      * @param keyName
@@ -88,6 +82,15 @@ public abstract class AbstractFactory extends groovy.util.AbstractFactory {
     protected AbstractFactory addFilter(final String keyName) {
         filters.add(keyName);
         return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void filterAttributes(final Map context, final Map attributes) {
+        for (final String key : filters) {
+            if (attributes.containsKey(key)) {
+                context.put(key, attributes.remove(key));
+            }
+        }
     }
 
     protected abstract Object newInstanceInner(
@@ -100,53 +103,6 @@ public abstract class AbstractFactory extends groovy.util.AbstractFactory {
             final Object value, final Map attributes)
             throws InstantiationException, IllegalAccessException {
         return instance;
-    }
-
-    protected Object tryCreatingBySpringContext(
-            final FactoryBuilderSupport builder) throws InstantiationException,
-            IllegalAccessException {
-        final ApplicationContext springContext = (ApplicationContext) builder
-                .getVariable("springContext");
-        // if user defines ofBean attribute
-        final Map context = builder.getContext();
-        if (context.containsKey(OF_BEAN)) {
-            if (springContext == null) {
-                throw new RuntimeException(
-                        "No Spring Context was specified, \"ofBean\" is not supported! ");
-            }
-            final String beanName = (String) context.get(OF_BEAN);
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("To create instance by beanName {}", beanName);
-            }
-            return springContext.getBean(beanName);
-        }
-        // if user defines ofClass attribute, factory will first try to
-        // check
-        // whether user specifies springContext, if so factory will try
-        // to
-        // create bean using spring autowire bean factory
-        // otherwise will use class.newInstance
-        if (context.containsKey(OF_CLASS)) {
-            final Object ofClazz = context.get(OF_CLASS);
-            Class<?> beanClass;
-            if (ofClazz.getClass().equals(String.class)) {
-                try {
-                    beanClass = Class.forName((String) ofClazz);
-                } catch (final ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-            } else if (ofClazz.getClass().equals(Class.class)) {
-                beanClass = (Class<?>) ofClazz;
-            } else {
-                throw new IllegalArgumentException("Illegal ofClass type "
-                        + ofClazz);
-            }
-
-            return springContext == null ? beanClass.newInstance()
-                    : springContext.getAutowireCapableBeanFactory().createBean(
-                            beanClass);
-        }
-        return null;
     }
 
 }
