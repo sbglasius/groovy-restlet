@@ -13,6 +13,7 @@ import org.restlet.Component;
 import org.restlet.data.Protocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 
 /**
  * @author keke
@@ -23,12 +24,16 @@ public class Constructor {
     private static final Logger LOG = LoggerFactory
                                             .getLogger(Constructor.class);
     private final GroovyShell   shell;
+    private ApplicationContext  springContext;
 
     public Constructor() {
         super();
         shell = new GroovyShell(Thread.currentThread().getContextClassLoader());
-        shell.getContext().setVariable("builder", new Builder());
+        final Builder builder = new Builder();
+        builder.setVariable("springContext", springContext);
+        shell.getContext().setVariable("builder", builder);
         shell.getContext().setVariable("protocol", Protocol.class);
+        shell.getContext().setVariable("springContext", springContext);
     }
 
     public Component build(final URL mainScript) {
