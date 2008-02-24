@@ -1,6 +1,9 @@
 #summary Examples of how to construct Restlet applications mentioned in [http://www.restlet.org/documentation/1.1/tutorial Restlet Tutorials]
 
-== Client examples ==
+=== [http://www.restlet.org/documentation/1.1/tutorial#part02 Part02] ===
 {{{
-builder.client
+//generic restlet constructor
+builder.restlet(ofClass:"org.restlet.Client", consArgs:[protocol.HTTP])
+//using shortcut
+builder.client(protocol.HTTP)
 }}}
