@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 /**
+ * Abstract Factory of Groovy Restlet.
+ * 
  * @author keke
  * @reversion $Revision$
  * @since 0.1.0
@@ -22,6 +24,8 @@ import org.springframework.context.ApplicationContext;
 public abstract class AbstractFactory extends groovy.util.AbstractFactory {
     private static final Logger   LOG            = LoggerFactory
                                                          .getLogger(AbstractFactory.class);
+
+    protected static final String CONS_ARG       = "consArgs";
     protected static final String OF_BEAN        = "ofBean";
     protected static final String OF_CLASS       = "ofClass";
     protected static final String SPRING_CONTEXT = "springContext";
@@ -30,7 +34,8 @@ public abstract class AbstractFactory extends groovy.util.AbstractFactory {
 
     public AbstractFactory() {
         super();
-        addFilter(OF_BEAN).addFilter(OF_CLASS).addFilter(URI);
+        addFilter(OF_BEAN).addFilter(OF_CLASS).addFilter(URI).addFilter(
+                CONS_ARG);
     }
 
     /*
@@ -39,6 +44,7 @@ public abstract class AbstractFactory extends groovy.util.AbstractFactory {
      * @see groovy.util.Factory#newInstance(groovy.util.FactoryBuilderSupport,
      *      java.lang.Object, java.lang.Object, java.util.Map)
      */
+    @SuppressWarnings("unchecked")
     @Override
     public Object newInstance(final FactoryBuilderSupport builder,
             final Object name, final Object value, final Map attributes)
@@ -80,12 +86,25 @@ public abstract class AbstractFactory extends groovy.util.AbstractFactory {
      * @return this object, in order to build a method chain.
      */
     protected AbstractFactory addFilter(final String keyName) {
+        assert keyName != null;
         filters.add(keyName);
         return this;
     }
 
+    /**
+     * Filter attributes: move all to-be-filtered attributes (which are defined
+     * in list {@link AbstractFactory#filters}) from map
+     * <code>attributes</code> to map <code>context</code>
+     * 
+     * @param context
+     *            context map
+     * @param attributes
+     *            attribute map
+     */
     @SuppressWarnings("unchecked")
     protected void filterAttributes(final Map context, final Map attributes) {
+        assert context != null;
+        assert attributes != null;
         for (final String key : filters) {
             if (attributes.containsKey(key)) {
                 context.put(key, attributes.remove(key));
@@ -93,11 +112,13 @@ public abstract class AbstractFactory extends groovy.util.AbstractFactory {
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected abstract Object newInstanceInner(
             final FactoryBuilderSupport builder, final Object name,
             final Object value, final Map attributes)
             throws InstantiationException, IllegalAccessException;
 
+    @SuppressWarnings("unchecked")
     protected Object postNewInstance(final Object instance,
             final FactoryBuilderSupport builder, final Object name,
             final Object value, final Map attributes)

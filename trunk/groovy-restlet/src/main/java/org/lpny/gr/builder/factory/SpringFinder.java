@@ -5,6 +5,7 @@ package org.lpny.gr.builder.factory;
 
 import groovy.lang.Closure;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +37,28 @@ public class SpringFinder extends Finder {
             ResourceFactory.STORE, ResourceFactory.HEAD,
             ResourceFactory.ACCEPT, ResourceFactory.OPTIONS,
             ResourceFactory.REPRESENT    };
+
+    private static Object createInstance(final Class<?> beanClass,
+            final Object[] args) throws SecurityException,
+            IllegalArgumentException, InstantiationException,
+            IllegalAccessException {
+        Class<?>[] types = null;
+        if (args != null) {
+            types = new Class<?>[args.length];
+            for (int i = 0; i < args.length; i++) {
+                types[i] = args[i].getClass();
+            }
+            try {
+                final Constructor<?> cons = beanClass.getConstructor(types);
+                return cons.newInstance(args);
+            } catch (final Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            return beanClass.newInstance();
+        }
+
+    }
 
     @SuppressWarnings("unchecked")
     static Object createFromSpringContext(
@@ -75,7 +98,8 @@ public class SpringFinder extends Finder {
                         + ofClazz);
             }
 
-            return springContext == null ? beanClass.newInstance()
+            return springContext == null ? createInstance(beanClass,
+                    (Object[]) context.get(AbstractFactory.CONS_ARG))
                     : springContext.getAutowireCapableBeanFactory().createBean(
                             beanClass);
         }
@@ -105,6 +129,9 @@ public class SpringFinder extends Finder {
                         || method.equals(ResourceFactory.STORE)) {
                     methodName = method + "Representation";
                 }
+                if (LOG.isDebugEnabled()) {
+
+                }
                 methodHandlers.put(methodName, methodHandler);
             }
         }
@@ -114,7 +141,11 @@ public class SpringFinder extends Finder {
 
             @Override
             public int accept(final Method method) {
+
                 if (methodHandlers.containsKey(method.getName())) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("To check method: {}", method);
+                    }
                     return 1;
                 }
                 return 0;
@@ -132,6 +163,9 @@ public class SpringFinder extends Finder {
             @Override
             public Object invoke(final Object proxy, final Method method,
                     final Object[] args) throws Throwable {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("To invoke: {}", method);
+                }
                 return methodHandlers.get(method.getName()).call(args);
             }
         } });
@@ -145,8 +179,14 @@ public class SpringFinder extends Finder {
     protected Handler createTarget(final Request request,
             final Response response) {
         try {
-            final Handler handler = (Handler) createFromSpringContext(
-                    springContext, context);
+            Handler handler = (Handler) createFromSpringContext(springContext,
+                    context);
+            if (handler == null) {
+                handler = new Resource();
+            }
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Handler: {}", handler);
+            }
             handler.init(getContext(), request, response);
             return postCreate(handler);
         } catch (final Exception e) {
