@@ -12,18 +12,17 @@ builder.client(protocol.HTTP)
 === [http://www.restlet.org/documentation/1.1/tutorial#part03 Part03] ===
 _At current moment, server construction does not support `restlet` way_
 {{{
-def server = builder.server(protocol:protocol.HTTP,
+builder.server(protocol:protocol.HTTP,
         port:8182){
     restlet(handle:{req, resp->
         resp.setEntity("Hello World", mediaType.TEXT_PLAIN)
     })
-}
-server.start()
+}.start()
+
 //or you can define restlet first
 def restlet = builder.restlet(handle:{req, resp->
     resp.setEntity("Hello World", mediaType.TEXT_PLAIN)
 })
-def server = builder.server(protocol:protocol.HTTP,
-        port:8182, target:restlet)
-server.start()
+builder.server(protocol:protocol.HTTP,
+        port:8182, target:restlet).start()
 }}}
