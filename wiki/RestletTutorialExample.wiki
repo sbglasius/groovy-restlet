@@ -1,1 +1,6 @@
-  Examples of how to construct Restlet applications mentioned in [http://www.restlet.org/documentation/1.1/tutorial Restlet Tutorials]
+#summary Examples of how to construct Restlet applications mentioned in [http://www.restlet.org/documentation/1.1/tutorial Restlet Tutorials]
+
+== Client examples ==
+{{{
+builder.client
+}}}
