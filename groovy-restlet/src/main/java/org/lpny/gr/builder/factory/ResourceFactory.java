@@ -9,12 +9,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.Validate;
+import org.restlet.Finder;
+import org.restlet.Router;
+import org.restlet.resource.Resource;
 import org.springframework.context.ApplicationContext;
 
 /**
+ * Factory to create <i>"resource"</i> of Restlet.
+ * 
+ * Actually the instance created by this factory is a {@link SpringFinder}
+ * instance rather than an instance of {@link Resource}. See implementation of
+ * {@link Router#attach(String, Class)}.
+ * 
+ * <h4>Usage:</h4>
+ * 
+ * 
  * @author keke
  * @reversion $Revision$
- * @version
+ * @since 0.1.0
+ * @see SpringFinder
+ * @see Finder
+ * @see Router
  */
 public class ResourceFactory extends AbstractFactory {
     protected static final String ACCEPT    = "accept";
@@ -24,6 +39,9 @@ public class ResourceFactory extends AbstractFactory {
     protected static final String REPRESENT = "represent";
     protected static final String STORE     = "store";
 
+    /**
+     * Constructor.
+     */
     public ResourceFactory() {
         super();
         addFilter(REMOVE).addFilter(REPRESENT).addFilter(OPTIONS).addFilter(

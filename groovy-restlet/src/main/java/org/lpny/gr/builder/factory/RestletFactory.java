@@ -17,6 +17,7 @@ import net.sf.cglib.proxy.InvocationHandler;
 
 import org.restlet.Component;
 import org.restlet.Context;
+import org.restlet.Guard;
 import org.restlet.Restlet;
 import org.restlet.Router;
 import org.restlet.data.Request;
@@ -25,14 +26,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Factory to create {@link Restlet} instance.
+ * Factory to create an instance of {@link Restlet} or any of its derived types.
+ * 
  * <p>
  * If user does not specify {@link AbstractFactory#OF_BEAN} or
  * {@link AbstractFactory#OF_CLASS} attributes, this factory will create an
  * instance of {@link Restlet}. If {@link AbstractFactory#OF_CLASS} was
  * specified but not Spring Context was defined, this factory will create a new
- * {@link Restlet} instance using {@code Class.newInstance()}. Otherwise this
- * factory will consult spring context to create a new instance.
+ * {@link Restlet} instance using {@code Class.newInstance()}. For example:
+ * 
+ * <pre>
+ * <code>
+ *   builder.restlet(ofClass:&quot;org.restlet.Guard&quot;)
+ *   //instance of class is also accepted
+ *   builder.restlet(ofClass:Guard.class)
+ * </code> 
+ * </pre>
+ * 
+ * will create an instance of {@link Guard}.
+ * </p>
+ * <p>
+ * Otherwise this factory will consult spring context to create a new instance.<br/>
+ * 
+ * If both <code>ofClass</code> and <code>ofBean</code> are specified,
+ * <code>ofBean</code> will be treated first.
  * </p>
  * 
  * @author keke
