@@ -239,14 +239,22 @@
                     <charset>UTF-8</charset>
                     <encoding>UTF-8</encoding>
                     <locale>en_US</locale>
-                    <links>
+                    <links>                        
                         <link>http://java.sun.com/javase/6/docs/api/</link>
+                        <link>http://groovy.codehaus.org/api/</link>
+                        <link>http://www.restlet.org/documentation/1.1/api/</link>
+                        <link>http://static.springframework.org/spring/docs/2.5.x/api/</link>
                     </links>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>2.4</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
