@@ -26,3 +26,20 @@ def restlet = builder.restlet(handle:{req, resp->
 builder.server(protocol:protocol.HTTP,
         port:8182, target:restlet).start()
 }}}
+
+=== [http://www.restlet.org/documentation/1.1/tutorial#part03 Part05] ===
+{{{
+//using component shortcut constructor
+def component = builder.component{
+    current.servers.add(protocol.HTTP, 8182)
+    
+    restlet(uri:"/trace", handle: {req, resp->
+        println "To process request: ${req}"
+        def message = """Resource URI: ${req.resourceRef}
+Root URI : ${req.rootRef}
+Routed part : ${req.resourceRef.baseRef}
+Remaining part: ${req.resourceRef.remainingPart}"""
+        resp.setEntity(message, mediaType.TEXT_PLAIN)
+    })
+}
+}}}
