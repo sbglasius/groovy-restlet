@@ -107,6 +107,7 @@ builder.component{
 }}}
 
 === [http://www.restlet.org/documentation/1.1/tutorial#part11 Part11] ===
+  Tip: You can implement the handle method of a Restlet using a groovy closure
 {{{
 builder.component{
     current.servers.add(protocol.HTTP, 8182)
@@ -139,6 +140,17 @@ builder.component{
 }}}
 
 === [http://www.restlet.org/documentation/1.1/tutorial#part12 Part12] ===
+Same as handle closure of Restlets, you can implement a simple Restlet Resource by groovy closures. Following attributes are supported:
+ * init:  `init` method
+ * represent: for `represent()` and `represent(Variant)` methods *HTTP GET*
+ * store: for `storeRepresentation()` method *HTTP PUT*
+ * remove: for `remoteRepresentation()` method *HTTP DELETE*
+ * accept: for `acceptRepresentation()` method *HTTP POST*
+ * head: for `handleHead()` method
+ * options: for `handleOptions` method
+
+ Tip: Specify `self` parameter in the last of parameter list. `self` indicates the resource instance.
+
 {{{
 builder.component{
     current.servers.add(protocol.HTTP, 8182)
