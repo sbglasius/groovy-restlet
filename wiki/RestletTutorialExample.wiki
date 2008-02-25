@@ -120,3 +120,25 @@ builder.component{
     }
 }.start()
 }}}
+
+=== [http://www.restlet.org/documentation/1.1/tutorial#part12 Part12] ===
+{{{
+builder.component{
+    current.servers.add(protocol.HTTP, 8182)
+    
+    application(uri:""){
+        router{
+            resource("/users/{user}",
+                    init:{ctx, req, resp, self->                           
+                        self.getVariants().add(new Variant(mediaType.TEXT_PLAIN))
+                    },
+                    represent:{variant, self->                        
+                        return new StringRepresentation(
+                                "Account of user \"${self.request.attributes.get('user')}".toString(),
+                                mediaType.TEXT_PLAIN);
+                    })
+             resource("/users/{user}/orders", ofClass:OrdersResource)
+        }
+    }
+}.start()
+}}}
