@@ -71,3 +71,20 @@ builder.component{
     }
 }.start()
 }}}
+
+=== [http://www.restlet.org/documentation/1.1/tutorial#part10 Part10] ===
+{{{
+builder.component{
+    current.servers.add(protocol.HTTP, 8182)
+    application(uri:""){
+        def router = router{
+            def target = "http://www.google.com/search?q={keywords}"
+            redirector(uri:"/search",
+                    targetTemplate:target, mode:redirectorMode.MODE_CLIENT_TEMPORARY,
+                    postAttach:{route->
+                        route.extractQuery("keywords","kwd",true)
+            })
+        }        
+    }
+}.start()
+}}}
