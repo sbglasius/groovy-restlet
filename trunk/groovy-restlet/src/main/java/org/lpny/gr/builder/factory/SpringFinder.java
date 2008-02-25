@@ -6,21 +6,21 @@ package org.lpny.gr.builder.factory;
 import groovy.lang.Closure;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import net.sf.cglib.proxy.Callback;
-import net.sf.cglib.proxy.CallbackFilter;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.InvocationHandler;
-import net.sf.cglib.proxy.LazyLoader;
-
+import org.restlet.Context;
 import org.restlet.Finder;
 import org.restlet.Handler;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.resource.Representation;
 import org.restlet.resource.Resource;
+import org.restlet.resource.ResourceException;
+import org.restlet.resource.Variant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -31,12 +31,15 @@ import org.springframework.context.ApplicationContext;
  * @version
  */
 public class SpringFinder extends Finder {
-    private static final Logger LOG = LoggerFactory
-            .getLogger(SpringFinder.class);
-    private static final String[] METHODS = { ResourceFactory.REMOVE,
-            ResourceFactory.STORE, ResourceFactory.HEAD,
-            ResourceFactory.ACCEPT, ResourceFactory.OPTIONS,
-            ResourceFactory.REPRESENT, ResourceFactory.INIT };
+
+    private static final Logger       LOG     = LoggerFactory
+                                                      .getLogger(SpringFinder.class);
+
+    private static final List<String> METHODS = Arrays.asList(new String[] {
+            ResourceFactory.REMOVE, ResourceFactory.STORE,
+            ResourceFactory.HEAD, ResourceFactory.ACCEPT,
+            ResourceFactory.OPTIONS, ResourceFactory.REPRESENT,
+            ResourceFactory.INIT             });
 
     private static Object createInstance(final Class<?> beanClass,
             final Object[] args) throws SecurityException,
@@ -107,7 +110,7 @@ public class SpringFinder extends Finder {
     }
 
     @SuppressWarnings("unchecked")
-    private final Map context;
+    private final Map                context;
 
     private final ApplicationContext springContext;
 
@@ -118,7 +121,7 @@ public class SpringFinder extends Finder {
         this.context = context;
     }
 
-    private Handler postCreate(final Handler handler) {
+    private Handler postCreate(final Handler instance) {
         final Map<String, Closure> methodHandlers = new HashMap<String, Closure>();
         for (final String method : METHODS) {
             final Closure methodHandler = (Closure) context.get(method);
@@ -129,65 +132,138 @@ public class SpringFinder extends Finder {
                         || method.equals(ResourceFactory.STORE)) {
                     methodName = method + "Representation";
                 }
-                if (LOG.isDebugEnabled()) {
-
+                if (method.equals(ResourceFactory.HEAD)
+                        || method.equals(ResourceFactory.OPTIONS)) {
+                    methodName = "handle" + method;
                 }
                 methodHandlers.put(methodName, methodHandler);
             }
         }
-        final Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass(Resource.class);
-        enhancer.setCallbackFilter(new CallbackFilter() {
-
-            @Override
-            public int accept(final Method method) {
-
-                if (methodHandlers.containsKey(method.getName())) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("To check method: {}", method);
+        if (methodHandlers.isEmpty()) {
+            return instance;
+        } else {
+            return new Resource() {
+                @Override
+                public void acceptRepresentation(final Representation entity)
+                        throws ResourceException {
+                    final Closure closure = methodHandlers
+                            .get(ResourceFactory.ACCEPT);
+                    if (closure == null) {
+                        super.acceptRepresentation(entity);
+                    } else {
+                        closure.call(packArgs(this, closure, entity));
                     }
-                    return 1;
                 }
-                return 0;
-            }
-        });
-        enhancer.setCallbacks(new Callback[] { new LazyLoader() {
 
-            @Override
-            public Object loadObject() throws Exception {
-                return handler;
-            }
+                @Override
+                public void handleHead() {
+                    final Closure closure = methodHandlers
+                            .get(ResourceFactory.HEAD);
+                    if (closure == null) {
+                        super.handleHead();
+                    } else {
+                        closure.call(packArgs(this, closure));
+                    }
+                }
 
-        }, new InvocationHandler() {
+                @Override
+                public void handleOptions() {
+                    final Closure closure = methodHandlers
+                            .get(ResourceFactory.OPTIONS);
+                    if (closure == null) {
+                        super.handleOptions();
+                    } else {
+                        closure.call(packArgs(this, closure));
+                    }
+                }
 
-            @Override
-            public Object invoke(final Object proxy, final Method method,
-                    final Object[] args) throws Throwable {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("To invoke: {} on proxy {}", new Object[] {
-                            method, proxy });
+                @Override
+                public void init(final Context context, final Request request,
+                        final Response response) {
+                    final Closure closure = methodHandlers
+                            .get(ResourceFactory.INIT);
+                    super.init(context, request, response);
+                    if (closure != null) {
+                        closure.call(packArgs(this, closure, context, request,
+                                response));
+                    }
                 }
-                if (method.getName().equals(ResourceFactory.INIT)) {
-                    // specially treat init method.
-                    method.invoke(handler, args);
+
+                @Override
+                public void removeRepresentations() throws ResourceException {
+                    final Closure closure = methodHandlers
+                            .get(ResourceFactory.REMOVE);
+                    if (closure == null) {
+                        super.removeRepresentations();
+                    } else {
+                        closure.call(packArgs(this, closure));
+                    }
                 }
-                Object[] newArgs = null;
-                final Closure handler = methodHandlers.get(method.getName());
-                if (handler.getParameterTypes().length - args.length == 1) {
-                    // push self to argument stack
-                    newArgs = new Object[args.length + 1];
-                    System.arraycopy(args, 0, newArgs, 0, args.length);
-                    newArgs[args.length] = proxy;
-                } else {
-                    newArgs = args;
+
+                @Override
+                public Representation represent() throws ResourceException {
+                    final Closure closure = methodHandlers
+                            .get(ResourceFactory.REPRESENT);
+                    if (closure != null) {
+                        final Class<?>[] paramTypes = closure
+                                .getParameterTypes();
+                        if (paramTypes.length == 1
+                                && paramTypes[0] == Variant.class
+                                || paramTypes.length == 0) {
+                            return (Representation) closure.call(packArgs(this,
+                                    closure));
+                        }
+                    }
+                    return super.represent();
                 }
-                return methodHandlers.get(method.getName()).call(newArgs);
-            }
-        } });
-        final Handler newHandler = (Handler) enhancer.create();
-        newHandler.init(handler.getContext(), handler.getRequest(), handler
-                .getResponse());
-        return newHandler;
+
+                @Override
+                public Representation represent(final Variant variant)
+                        throws ResourceException {
+                    final Closure closure = methodHandlers
+                            .get(ResourceFactory.REPRESENT);
+                    if (closure != null) {
+                        final Class<?>[] paramTypes = closure
+                                .getParameterTypes();
+                        if (paramTypes.length == 1
+                                && paramTypes[0] == Variant.class
+                                || paramTypes.length == 2) {
+                            return (Representation) closure.call(packArgs(this,
+                                    closure, variant));
+                        }
+                    }
+                    return super.represent(variant);
+
+                }
+
+                @Override
+                public void storeRepresentation(final Representation entity)
+                        throws ResourceException {
+                    final Closure closure = methodHandlers
+                            .get(ResourceFactory.STORE);
+                    if (closure == null) {
+                        super.storeRepresentation(entity);
+                    } else {
+                        closure.call(packArgs(this, closure, entity));
+                    }
+                }
+
+                private Object[] packArgs(final Object self,
+                        final Closure closure, Object... args) {
+                    if (args == null) {
+                        args = new Object[0];
+                    }
+                    if (args.length == closure.getParameterTypes().length) {
+                        return args;
+                    } else {
+                        final List<Object> newArgs = new ArrayList<Object>(
+                                Arrays.asList(args));
+                        newArgs.add(self);
+                        return newArgs.toArray();
+                    }
+                }
+            };
+        }
     }
 
     @Override
@@ -202,8 +278,12 @@ public class SpringFinder extends Finder {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Handler: {}", handler);
             }
+            handler = postCreate(handler);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("To initialize Handler {}", handler);
+            }
             handler.init(getContext(), request, response);
-            return postCreate(handler);
+            return handler;
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
