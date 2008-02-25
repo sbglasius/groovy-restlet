@@ -57,3 +57,17 @@ builder.component{
     }
 }.start()
 }}}
+
+=== [http://www.restlet.org/documentation/1.1/tutorial#part09 Part09] ===
+{{{
+builder.component{
+    current.servers.add(protocol.HTTP, 8182)
+    application(uri:""){
+        guard(scheme:challengeScheme.HTTP_BASIC, realm:"Tutorial")
+            .secrets.put("scott","tiger".toCharArray())
+            
+        def dir = directory(autoAttach:false, root:"")
+        current.root.next=dir
+    }
+}.start()
+}}}
