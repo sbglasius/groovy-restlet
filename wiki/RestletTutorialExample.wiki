@@ -1,16 +1,28 @@
 #summary Examples of how to construct Restlet applications mentioned in [http://www.restlet.org/documentation/1.1/tutorial Restlet Tutorials]
-#labels examples
+#labels examples,Featured
+
+For example groovy scripts, see http://code.google.com/p/groovy-restlet/source/browse/trunk/groovy-restlet/src/test/groovy/org/lpny/gr/examples/tutorials/
 
 === [http://www.restlet.org/documentation/1.1/tutorial#part02 Part02] ===
+Example about creating a [http://www.restlet.org/documentation/1.1/api/org/restlet/Client.html Restlet Client] instance.
+
+You can use *shortcut* `client` constructor as shown in `#1`; also you can use generic `restlet` constructor to create client instance. 
+
+   Tip: you can use `restlet(ofClass:[class name|class instance])` to create any instance of derived type of [http://www.restlet.org/documentation/1.1/api/org/restlet/Restlet.html Restlet]. In this case, you need to specify attribute `consArgs` which are an array of constructing parameters.
+
 {{{
-//generic restlet constructor
-builder.restlet(ofClass:"org.restlet.Client", consArgs:[protocol.HTTP] as Object[])
-//using shortcut
+//#1 using shortcut
 builder.client(protocol.HTTP)
+
+//#2 generic restlet constructor
+builder.restlet(ofClass:"org.restlet.Client", consArgs:[protocol.HTTP] as Object[])
 }}}
 
 === [http://www.restlet.org/documentation/1.1/tutorial#part03 Part03] ===
 _At current moment, server construction does not support `restlet` way_
+Nesting here indicates a parent-child relationship.
+
+   Tip: the child of a `server` component becoming the [http://www.restlet.org/documentation/1.1/api/org/restlet/Server.html#setTarget(org.restlet.Restlet)   target] property of the [http://www.restlet.org/documentation/1.1/api/org/restlet/Server.html Server].
 {{{
 builder.server(protocol:protocol.HTTP,
         port:8182){
