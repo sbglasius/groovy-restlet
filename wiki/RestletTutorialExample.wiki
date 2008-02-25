@@ -27,7 +27,7 @@ builder.server(protocol:protocol.HTTP,
         port:8182, target:restlet).start()
 }}}
 
-=== [http://www.restlet.org/documentation/1.1/tutorial#part03 Part05] ===
+=== [http://www.restlet.org/documentation/1.1/tutorial#part05 Part05] ===
 {{{
 //using component shortcut constructor
 def component = builder.component{
@@ -42,4 +42,18 @@ Remaining part: ${req.resourceRef.remainingPart}"""
         resp.setEntity(message, mediaType.TEXT_PLAIN)
     })
 }
+}}}
+
+=== [http://www.restlet.org/documentation/1.1/tutorial#part06 Part06] ===
+{{{
+
+def ROOT_URI = ""
+builder.component{
+    current.servers.add(protocol.HTTP, 8182)
+    current.clients.add(protocol.FILE)
+    
+    application(uri:""){
+        directory(root:ROOT_URI)
+    }
+}.start()
 }}}
