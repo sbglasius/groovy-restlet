@@ -74,7 +74,7 @@ builder.component{
 === [http://www.restlet.org/documentation/1.1/tutorial#part09 Part09] ===
    Tip: using `current` to get the current instance.
 
-By default any nested component will be automatically attached to its parent component according to their parent-child relationship. Here guard is automatically attached to its parent ([http://www.restlet.org/documentation/1.1/api/org/restlet/Application.html Application] here) as its [http://www.restlet.org/documentation/1.1/api/org/restlet/Application.html#setRoot(org.restlet.Restlet) root]. Adding attribute `autoAttach:false` can disable this feature.
+By default any nested component will be automatically attached to its parent component according to their parent-child relationship. Here [http://www.restlet.org/documentation/1.1/api/org/restlet/Guard.html guard] is automatically attached to its parent ([http://www.restlet.org/documentation/1.1/api/org/restlet/Application.html Application] here) as its [http://www.restlet.org/documentation/1.1/api/org/restlet/Application.html#setRoot(org.restlet.Restlet) root]. Adding attribute `autoAttach:false` can disable this feature.
 {{{
 builder.component{
     current.servers.add(protocol.HTTP, 8182)
@@ -107,7 +107,7 @@ builder.component{
 }}}
 
 === [http://www.restlet.org/documentation/1.1/tutorial#part11 Part11] ===
-  Tip: You can implement the handle method of a Restlet using a groovy closure
+  Tip: You can implement the [http://www.restlet.org/documentation/1.1/api/org/restlet/Restlet.html#handle(org.restlet.data.Request,%20org.restlet.data.Response) handle method] of a [http://www.restlet.org/documentation/1.1/api/org/restlet/Restlet.html Restlet] using a groovy closure
 {{{
 builder.component{
     current.servers.add(protocol.HTTP, 8182)
@@ -140,7 +140,7 @@ builder.component{
 }}}
 
 === [http://www.restlet.org/documentation/1.1/tutorial#part12 Part12] ===
-Same as handle closure of Restlets, you can implement a simple Restlet Resource by groovy closures. Following attributes are supported:
+Same as handle closure of a Restlet, you can implement a simple [http://www.restlet.org/documentation/1.1/api/org/restlet/resource/Resource.html Restlet Resource] using groovy closures. Following attributes are supported:
  * init:  `init` method
  * represent: for `represent()` and `represent(Variant)` methods *HTTP GET*
  * store: for `storeRepresentation()` method *HTTP PUT*
@@ -149,7 +149,7 @@ Same as handle closure of Restlets, you can implement a simple Restlet Resource 
  * head: for `handleHead()` method
  * options: for `handleOptions` method
 
- Tip: Specify `self` parameter in the last of parameter list. `self` indicates the resource instance.
+ Tip: Specify `self` parameter in the last of parameter list. This special `self` instance indicates the resource instance.
 
 {{{
 builder.component{
