@@ -9,6 +9,8 @@ import org.lpny.gr.builder.factory.ApplicationFactory;
 import org.lpny.gr.builder.factory.ClientFactory;
 import org.lpny.gr.builder.factory.ComponentFactory;
 import org.lpny.gr.builder.factory.DirectoryFactory;
+import org.lpny.gr.builder.factory.GuardFactory;
+import org.lpny.gr.builder.factory.RedirectorFactory;
 import org.lpny.gr.builder.factory.ResourceFactory;
 import org.lpny.gr.builder.factory.RestletFactory;
 import org.lpny.gr.builder.factory.RouterFactory;
@@ -42,5 +44,7 @@ public class Builder extends FactoryBuilderSupport {
         registerFactory("directory", new DirectoryFactory());
         registerFactory("client", new ClientFactory());
         registerFactory("server", new ServerFactory());
+        registerFactory("guard", new GuardFactory());
+        registerFactory("redirector", new RedirectorFactory());
     }
 }
