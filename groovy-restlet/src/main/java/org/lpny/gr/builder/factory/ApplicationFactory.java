@@ -21,25 +21,10 @@ import org.slf4j.LoggerFactory;
  */
 public class ApplicationFactory extends RestletFactory {
     private static final Logger LOG = LoggerFactory
-                                            .getLogger(ApplicationFactory.class);
+            .getLogger(ApplicationFactory.class);
 
     public ApplicationFactory() {
         super();
-    }
-
-    @Override
-    public void setChild(final FactoryBuilderSupport builder,
-            final Object parent, final Object child) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("SetChild: child={}", child);
-        }
-        if (child == null) {
-            return;
-        }
-        if (child instanceof Restlet) {
-            final Application application = (Application) parent;
-            application.setRoot((Restlet) child);
-        }
     }
 
     /*
@@ -54,6 +39,23 @@ public class ApplicationFactory extends RestletFactory {
             final Object name, final Object value, final Map attributes)
             throws InstantiationException, IllegalAccessException {
         return new Application(getRestletContext(builder));
+    }
+
+    @Override
+    protected Object setChildInner(final FactoryBuilderSupport builder,
+            final Object parent, final Object child) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SetChild: child={} on parent={}", new Object[] { child,
+                    parent });
+        }
+        if (child == null) {
+            return null;
+        }
+        if (child instanceof Restlet) {
+            final Application application = (Application) parent;
+            application.setRoot((Restlet) child);
+        }
+        return null;
     }
 
 }

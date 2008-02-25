@@ -41,6 +41,41 @@ public class ExampleRunner {
 
     }
 
+    @Test(groups = { "examples" })
+    public void runPart05() {
+        fixture.build(new File(ROOT, "Part05.groovy").toURI());
+
+    }
+
+    @Test(groups = { "examples" })
+    public void runPart06() {
+        fixture.build(new File(ROOT, "Part06.groovy").toURI());
+
+    }
+
+    @Test(groups = { "examples" })
+    public void runPart09() {
+        fixture.build(new File(ROOT, "Part09.groovy").toURI());
+
+    }
+
+    @Test(groups = { "examples" })
+    public void runPart10() {
+        fixture.build(new File(ROOT, "Part10.groovy").toURI());
+
+    }
+
+    @Test(groups = { "examples" })
+    public void runPart11() {
+        fixture.build(new File(ROOT, "Part11.groovy").toURI());
+    }
+
+    @Test(groups = { "examples" })
+    public void runPart12() {
+        fixture.build(new File(ROOT, "Part12.groovy").toURI());
+
+    }
+
     @BeforeClass(groups = { "examples" })
     public void setup() {
         fixture = new Constructor();

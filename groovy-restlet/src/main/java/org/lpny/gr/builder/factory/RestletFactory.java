@@ -58,36 +58,14 @@ import org.slf4j.LoggerFactory;
  */
 public class RestletFactory extends AbstractFactory {
 
-    private static final Logger   LOG    = LoggerFactory
-                                                 .getLogger(RestletFactory.class);
+    private static final Logger LOG = LoggerFactory
+            .getLogger(RestletFactory.class);
 
     protected static final String HANDLE = "handle";
 
     public RestletFactory() {
         super();
         addFilter(HANDLE);
-    }
-
-    @Override
-    public void setParent(final FactoryBuilderSupport builder,
-            final Object parent, final Object child) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("SetParent: parent={}", parent);
-        }
-
-        if (parent == null) {
-            return;
-        }
-        final String uri = (String) builder.getContext().get(URI);
-        if (uri == null) {
-            return;
-        }
-        if (parent instanceof Component) {
-            ((Component) parent).getDefaultHost().attach(uri, (Restlet) child);
-        } else if (parent instanceof Router) {
-            ((Router) parent).attach(uri, (Restlet) child);
-        }
-
     }
 
     protected Context getRestletContext(final FactoryBuilderSupport builder) {
@@ -164,6 +142,30 @@ public class RestletFactory extends AbstractFactory {
             LOG.debug("Enhanced: {}", newIns);
         }
         return newIns;
+    }
+
+    @Override
+    protected Object setParentInner(final FactoryBuilderSupport builder,
+            final Object parent, final Object child) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SetParent: parent={} child={}", new Object[] { parent,
+                    child });
+        }
+
+        if (parent == null) {
+            return null;
+        }
+        final String uri = (String) builder.getContext().get(URI);
+        if (uri == null) {
+            return null;
+        }
+        if (parent instanceof Component) {
+            return ((Component) parent).getDefaultHost().attach(uri,
+                    (Restlet) child);
+        } else if (parent instanceof Router) {
+            return ((Router) parent).attach(uri, (Restlet) child);
+        }
+        return null;
     }
 
 }

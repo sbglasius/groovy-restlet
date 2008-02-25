@@ -22,31 +22,17 @@ import org.slf4j.LoggerFactory;
  * @version
  */
 public class ServerFactory extends RestletFactory {
-    private static final Logger   LOG     = LoggerFactory
-                                                  .getLogger(ServerFactory.class);
+    private static final Logger LOG = LoggerFactory
+            .getLogger(ServerFactory.class);
     protected static final String ADDRESS = "address";
 
-    protected static final String PORT    = "port";
+    protected static final String PORT = "port";
 
     /**
      * 
      */
     public ServerFactory() {
         super();
-    }
-
-    @Override
-    public void setChild(final FactoryBuilderSupport builder,
-            final Object parent, final Object child) {
-        if (child == null) {
-            return;
-        }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("To set child {}", child);
-        }
-        if (child instanceof Restlet) {
-            ((Server) parent).setTarget((Restlet) child);
-        }
     }
 
     @Override
@@ -59,6 +45,20 @@ public class ServerFactory extends RestletFactory {
         final Integer port = (Integer) attributes.remove(PORT);
         return new Server(getRestletContext(builder), protocols, address, port,
                 null);
+    }
+
+    @Override
+    protected Object setChildInner(final FactoryBuilderSupport builder,
+            final Object parent, final Object child) {
+        if (child != null) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("To set child {}", child);
+            }
+            if (child instanceof Restlet) {
+                ((Server) parent).setTarget((Restlet) child);
+            }
+        }
+        return null;
     }
 
 }

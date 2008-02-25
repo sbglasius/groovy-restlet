@@ -5,6 +5,7 @@ package org.lpny.gr.builder.factory;
 
 import groovy.util.FactoryBuilderSupport;
 
+import java.io.File;
 import java.util.Map;
 
 import org.restlet.Directory;
@@ -41,7 +42,8 @@ public class DirectoryFactory extends RestletFactory {
                 root = (String) value;
             }
         }
-        return new Directory(getRestletContext(builder), root);
+        return new Directory(getRestletContext(builder), new File(root).toURI()
+                .toString());
     }
 
 }

@@ -10,9 +10,12 @@ import java.io.File;
 import java.net.URI;
 
 import org.lpny.gr.builder.Builder;
+import org.restlet.Redirector;
 import org.restlet.Router;
+import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
 import org.restlet.data.Protocol;
+import org.restlet.data.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -23,10 +26,10 @@ import org.springframework.context.ApplicationContext;
  * @since 0.1.0
  */
 public class Constructor {
-    private static final Logger      LOG = LoggerFactory
-                                                 .getLogger(Constructor.class);
-    private final Builder            builder;
-    private final GroovyShell        shell;
+    private static final Logger LOG = LoggerFactory
+            .getLogger(Constructor.class);
+    private final Builder builder;
+    private final GroovyShell shell;
     private final ApplicationContext springContext;
 
     public Constructor() {
@@ -66,6 +69,9 @@ public class Constructor {
         context.setVariable("protocol", Protocol.class);
         context.setVariable("mediaType", MediaType.class);
         context.setVariable("springContext", springContext);
+        context.setVariable("status", Status.class);
+        context.setVariable("challengeScheme", ChallengeScheme.class);
+        context.setVariable("redirectorMode", Redirector.class);
         // router modes
         context.setVariable("routingMode", Router.class);
     }

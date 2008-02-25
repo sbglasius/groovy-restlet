@@ -3,6 +3,7 @@
  */
 package org.lpny.gr.builder.factory;
 
+import groovy.lang.Closure;
 import groovy.util.FactoryBuilderSupport;
 
 import java.util.ArrayList;
@@ -22,20 +23,22 @@ import org.springframework.context.ApplicationContext;
  * @since 0.1.0
  */
 public abstract class AbstractFactory extends groovy.util.AbstractFactory {
-    private static final Logger   LOG            = LoggerFactory
-                                                         .getLogger(AbstractFactory.class);
+    private static final Logger LOG = LoggerFactory
+            .getLogger(AbstractFactory.class);
 
-    protected static final String CONS_ARG       = "consArgs";
-    protected static final String OF_BEAN        = "ofBean";
-    protected static final String OF_CLASS       = "ofClass";
+    protected static final String AUTO_ATTACH = "autoAttach";
+    protected static final String CONS_ARG = "consArgs";
+    protected static final String OF_BEAN = "ofBean";
+    protected static final String OF_CLASS = "ofClass";
+    protected static final String POST_ATTACH = "postAttach";
     protected static final String SPRING_CONTEXT = "springContext";
-    protected static final String URI            = "uri";
-    private final List<String>    filters        = new ArrayList<String>();
+    protected static final String URI = "uri";
+    private final List<String> filters = new ArrayList<String>();
 
     public AbstractFactory() {
         super();
         addFilter(OF_BEAN).addFilter(OF_CLASS).addFilter(URI).addFilter(
-                CONS_ARG);
+                CONS_ARG).addFilter(AUTO_ATTACH).addFilter(POST_ATTACH);
     }
 
     /*
@@ -61,23 +64,50 @@ public abstract class AbstractFactory extends groovy.util.AbstractFactory {
     }
 
     @Override
-    public void setChild(final FactoryBuilderSupport builder,
-            final Object parent, final Object child) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("TO set Child {} on Parent {}", new Object[] { child,
-                    parent });
+    public void onNodeCompleted(final FactoryBuilderSupport builder,
+            final Object parent, final Object node) {
+        super.onNodeCompleted(builder, parent, node);
+        for (final String filter : filters) {
+            builder.getContext().remove(filter);
         }
-        super.setChild(builder, parent, child);
     }
 
     @Override
-    public void setParent(final FactoryBuilderSupport builder,
+    public final void setChild(final FactoryBuilderSupport builder,
             final Object parent, final Object child) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("TO set Parent {} on Child {}", new Object[] { parent,
-                    child });
+        if (isAutoAttachEnabled(builder.getContext())) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("TO set Child {} on Parent {}", new Object[] { child,
+                        parent });
+            }
+            doPostAttach(builder, setChildInner(builder, parent, child));
         }
-        super.setParent(builder, parent, child);
+    }
+
+    @Override
+    public final void setParent(final FactoryBuilderSupport builder,
+            final Object parent, final Object child) {
+        if (isAutoAttachEnabled(builder.getContext())) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("TO set Parent {} on Child {}", new Object[] {
+                        parent, child });
+            }
+
+            doPostAttach(builder, setParentInner(builder, parent, child));
+        }
+    }
+
+    private void doPostAttach(final FactoryBuilderSupport builder,
+            final Object result) {
+        if (result == null) {
+            return;
+        }
+        final Closure postAttach = (Closure) builder.getContext().remove(
+                POST_ATTACH);
+        if (postAttach == null) {
+            return;
+        }
+        postAttach.call(result);
     }
 
     /**
@@ -112,6 +142,14 @@ public abstract class AbstractFactory extends groovy.util.AbstractFactory {
         }
     }
 
+    protected boolean isAutoAttachEnabled(final Map context) {
+        if (context.containsKey(AUTO_ATTACH)
+                && !((Boolean) context.get(AUTO_ATTACH)).booleanValue()) {
+            return false;
+        }
+        return true;
+    }
+
     @SuppressWarnings("unchecked")
     protected abstract Object newInstanceInner(
             final FactoryBuilderSupport builder, final Object name,
@@ -124,6 +162,17 @@ public abstract class AbstractFactory extends groovy.util.AbstractFactory {
             final Object value, final Map attributes)
             throws InstantiationException, IllegalAccessException {
         return instance;
+    }
+
+    protected Object setChildInner(final FactoryBuilderSupport builder,
+            final Object parent, final Object child) {
+        return null;
+
+    }
+
+    protected Object setParentInner(final FactoryBuilderSupport builder,
+            final Object parent, final Object child) {
+        return null;
     }
 
 }

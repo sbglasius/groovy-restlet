@@ -32,12 +32,13 @@ import org.springframework.context.ApplicationContext;
  * @see Router
  */
 public class ResourceFactory extends AbstractFactory {
-    protected static final String ACCEPT    = "accept";
-    protected static final String HEAD      = "head";
-    protected static final String OPTIONS   = "options";
-    protected static final String REMOVE    = "remove";
+    protected static final String ACCEPT = "accept";
+    protected static final String HEAD = "head";
+    protected static final String INIT = "init";
+    protected static final String OPTIONS = "options";
+    protected static final String REMOVE = "remove";
     protected static final String REPRESENT = "represent";
-    protected static final String STORE     = "store";
+    protected static final String STORE = "store";
 
     /**
      * Constructor.
@@ -45,7 +46,12 @@ public class ResourceFactory extends AbstractFactory {
     public ResourceFactory() {
         super();
         addFilter(REMOVE).addFilter(REPRESENT).addFilter(OPTIONS).addFilter(
-                ACCEPT).addFilter(STORE).addFilter(HEAD);
+                ACCEPT).addFilter(STORE).addFilter(HEAD).addFilter(INIT);
+    }
+
+    @Override
+    public boolean isLeaf() {
+        return true;
     }
 
     @Override
@@ -71,4 +77,20 @@ public class ResourceFactory extends AbstractFactory {
                 .getVariable(SPRING_CONTEXT), new HashMap(builder.getContext()));
     }
 
+    @Override
+    protected Object setParentInner(final FactoryBuilderSupport builder,
+            final Object parent, final Object child) {
+        if (parent != null) {
+            final String uri = (String) builder.getContext().remove(URI);
+            if (parent instanceof Router) {
+                final Router router = (Router) parent;
+                if (uri == null) {
+                    return router.attachDefault((Finder) child);
+                } else {
+                    return router.attach(uri, (Finder) child);
+                }
+            }
+        }
+        return null;
+    }
 }

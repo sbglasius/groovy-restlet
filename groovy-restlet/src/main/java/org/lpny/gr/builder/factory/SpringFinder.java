@@ -31,12 +31,12 @@ import org.springframework.context.ApplicationContext;
  * @version
  */
 public class SpringFinder extends Finder {
-    private static final Logger   LOG     = LoggerFactory
-                                                  .getLogger(SpringFinder.class);
+    private static final Logger LOG = LoggerFactory
+            .getLogger(SpringFinder.class);
     private static final String[] METHODS = { ResourceFactory.REMOVE,
             ResourceFactory.STORE, ResourceFactory.HEAD,
             ResourceFactory.ACCEPT, ResourceFactory.OPTIONS,
-            ResourceFactory.REPRESENT    };
+            ResourceFactory.REPRESENT, ResourceFactory.INIT };
 
     private static Object createInstance(final Class<?> beanClass,
             final Object[] args) throws SecurityException,
@@ -107,7 +107,7 @@ public class SpringFinder extends Finder {
     }
 
     @SuppressWarnings("unchecked")
-    private final Map                context;
+    private final Map context;
 
     private final ApplicationContext springContext;
 
@@ -164,9 +164,24 @@ public class SpringFinder extends Finder {
             public Object invoke(final Object proxy, final Method method,
                     final Object[] args) throws Throwable {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("To invoke: {}", method);
+                    LOG.debug("To invoke: {} on proxy {}", new Object[] {
+                            method, proxy });
                 }
-                return methodHandlers.get(method.getName()).call(args);
+                if (method.getName().equals(ResourceFactory.INIT)) {
+                    // specially treat init method.
+                    method.invoke(handler, args);
+                }
+                Object[] newArgs = null;
+                final Closure handler = methodHandlers.get(method.getName());
+                if (handler.getParameterTypes().length - args.length == 1) {
+                    // push self to argument stack
+                    newArgs = new Object[args.length + 1];
+                    System.arraycopy(args, 0, newArgs, 0, args.length);
+                    newArgs[args.length] = proxy;
+                } else {
+                    newArgs = args;
+                }
+                return methodHandlers.get(method.getName()).call(newArgs);
             }
         } });
         final Handler newHandler = (Handler) enhancer.create();
