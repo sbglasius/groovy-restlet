@@ -35,4 +35,4 @@ def comp = builder.component(){
 
 comp.servers.add(protocol.HTTP, 8182)
 }}}
-If spring context is specified when creating `GroovyRestlet` instance, Spring'` AutowireCapableBeanFactory will be used to create that instance and autowire necessry properties.
+If spring context is specified when creating `GroovyRestlet` instance, Spring'` [http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/beans/factory/config/AutowireCapableBeanFactory.html AutowireCapableBeanFactory] will be used to create that instance and autowire all necessary properties.
