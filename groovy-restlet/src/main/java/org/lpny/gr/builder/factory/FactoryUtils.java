@@ -3,10 +3,12 @@
  */
 package org.lpny.gr.builder.factory;
 
+import groovy.lang.Closure;
 import groovy.util.FactoryBuilderSupport;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -136,6 +138,21 @@ public class FactoryUtils {
             return beanClass.newInstance();
         }
     
+    }
+
+    protected static Object[] packArgs(final Object self,
+            final Closure closure, Object... args) {
+        if (args == null) {
+            args = new Object[0];
+        }
+        if (args.length == closure.getParameterTypes().length) {
+            return args;
+        } else {
+            final List<Object> newArgs = new ArrayList<Object>(Arrays
+                    .asList(args));
+            newArgs.add(self);
+            return newArgs.toArray();
+        }
     }
 
 }

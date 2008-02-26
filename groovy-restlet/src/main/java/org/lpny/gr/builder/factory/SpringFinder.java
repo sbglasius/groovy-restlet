@@ -5,7 +5,6 @@ package org.lpny.gr.builder.factory;
 
 import groovy.lang.Closure;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +45,7 @@ public class SpringFinder extends Finder {
             if (closure == null) {
                 super.acceptRepresentation(entity);
             } else {
-                closure.call(packArgs(this, closure, entity));
+                closure.call(FactoryUtils.packArgs(this, closure, entity));
             }
         }
 
@@ -56,7 +55,7 @@ public class SpringFinder extends Finder {
             if (closure == null) {
                 super.handleHead();
             } else {
-                closure.call(packArgs(this, closure));
+                closure.call(FactoryUtils.packArgs(this, closure));
             }
         }
 
@@ -66,7 +65,7 @@ public class SpringFinder extends Finder {
             if (closure == null) {
                 super.handleOptions();
             } else {
-                closure.call(packArgs(this, closure));
+                closure.call(FactoryUtils.packArgs(this, closure));
             }
         }
 
@@ -77,7 +76,7 @@ public class SpringFinder extends Finder {
             super.init(context, request, response);
             if (closure != null) {
                 closure
-                        .call(packArgs(this, closure, context, request,
+                        .call(FactoryUtils.packArgs(this, closure, context, request,
                                 response));
             }
         }
@@ -88,7 +87,7 @@ public class SpringFinder extends Finder {
             if (closure == null) {
                 super.removeRepresentations();
             } else {
-                closure.call(packArgs(this, closure));
+                closure.call(FactoryUtils.packArgs(this, closure));
             }
         }
 
@@ -101,7 +100,7 @@ public class SpringFinder extends Finder {
                 if (paramTypes.length == 1 && paramTypes[0] == Variant.class
                         || paramTypes.length == 0) {
                     return (Representation) closure
-                            .call(packArgs(this, closure));
+                            .call(FactoryUtils.packArgs(this, closure));
                 }
             }
             return super.represent();
@@ -116,7 +115,7 @@ public class SpringFinder extends Finder {
                 final Class<?>[] paramTypes = closure.getParameterTypes();
                 if (paramTypes.length == 1 && paramTypes[0] == Variant.class
                         || paramTypes.length == 2) {
-                    return (Representation) closure.call(packArgs(this,
+                    return (Representation) closure.call(FactoryUtils.packArgs(this,
                             closure, variant));
                 }
             }
@@ -131,22 +130,7 @@ public class SpringFinder extends Finder {
             if (closure == null) {
                 super.storeRepresentation(entity);
             } else {
-                closure.call(packArgs(this, closure, entity));
-            }
-        }
-
-        private Object[] packArgs(final Object self, final Closure closure,
-                Object... args) {
-            if (args == null) {
-                args = new Object[0];
-            }
-            if (args.length == closure.getParameterTypes().length) {
-                return args;
-            } else {
-                final List<Object> newArgs = new ArrayList<Object>(Arrays
-                        .asList(args));
-                newArgs.add(self);
-                return newArgs.toArray();
+                closure.call(FactoryUtils.packArgs(this, closure, entity));
             }
         }
     }
