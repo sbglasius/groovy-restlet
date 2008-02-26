@@ -26,10 +26,10 @@ import org.springframework.context.ApplicationContext;
  * @since 0.1.0
  */
 public class GroovyRestlet {
-    private static final Logger LOG = LoggerFactory
-            .getLogger(GroovyRestlet.class);
-    private final RestletBuilder builder;
-    private final GroovyShell shell;
+    private static final Logger      LOG = LoggerFactory
+                                                 .getLogger(GroovyRestlet.class);
+    private final RestletBuilder     builder;
+    private final GroovyShell        shell;
     private final ApplicationContext springContext;
 
     public GroovyRestlet() {

@@ -29,15 +29,15 @@ import org.restlet.data.ChallengeScheme;
  */
 public class GuardFactory extends RestletFactory {
     private static final ChallengeScheme NONE_SCHEME = ChallengeScheme
-            .valueOf("None");
+                                                             .valueOf("None");
     /**
      * <b>Attribute</b>: Guard Realm
      */
-    protected static final String REALM = "realm";
+    protected static final String        REALM       = "realm";
     /**
      * <b>Attribute:</b> Guard challengeSchema
      */
-    protected static final String SCHEME = "scheme";
+    protected static final String        SCHEME      = "scheme";
 
     /*
      * (non-Javadoc)
@@ -45,6 +45,7 @@ public class GuardFactory extends RestletFactory {
      * @see org.lpny.gr.builder.factory.AbstractFactory#newInstanceInner(groovy.util.FactoryBuilderSupport,
      *      java.lang.Object, java.lang.Object, java.util.Map)
      */
+    @SuppressWarnings("unchecked")
     @Override
     protected Object newInstanceInner(final FactoryBuilderSupport builder,
             final Object name, final Object value, final Map attributes)

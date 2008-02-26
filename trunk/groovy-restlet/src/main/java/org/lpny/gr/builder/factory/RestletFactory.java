@@ -57,8 +57,8 @@ import org.slf4j.LoggerFactory;
  */
 public class RestletFactory extends AbstractFactory {
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(RestletFactory.class);
+    private static final Logger   LOG    = LoggerFactory
+                                                 .getLogger(RestletFactory.class);
 
     protected static final String HANDLE = "handle";
 
@@ -97,7 +97,6 @@ public class RestletFactory extends AbstractFactory {
         final Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(Restlet.class);
         enhancer.setCallbackFilter(new CallbackFilter() {
-            @Override
             public int accept(final Method method) {
                 try {
                     if (method.equals(Restlet.class.getMethod("handle",
@@ -112,12 +111,10 @@ public class RestletFactory extends AbstractFactory {
         });
         enhancer.setCallbacks(new Callback[] { new Dispatcher() {
 
-            @Override
             public Object loadObject() throws Exception {
                 return instance;
             }
         }, new InvocationHandler() {
-            @Override
             public Object invoke(final Object proxy, final Method method,
                     final Object[] args) throws Throwable {
                 if (LOG.isDebugEnabled()) {

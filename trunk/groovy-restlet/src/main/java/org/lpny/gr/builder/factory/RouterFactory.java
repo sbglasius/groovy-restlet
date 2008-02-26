@@ -22,6 +22,7 @@ public class RouterFactory extends RestletFactory {
         super();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected Object newInstanceInner(final FactoryBuilderSupport builder,
             final Object name, final Object value, final Map attributes)
