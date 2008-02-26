@@ -3,9 +3,12 @@
  */
 package org.lpny.gr.builder.factory;
 
+import groovy.util.FactoryBuilderSupport;
+
 import java.util.HashMap;
 
 import org.restlet.Application;
+import org.restlet.Restlet;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -15,6 +18,7 @@ import org.testng.annotations.Test;
  * @reversion $Revision$
  * @version
  */
+@Test(groups = "unittest")
 public class ApplicationFactoryTest extends AbstractFactoryTest {
     private ApplicationFactory fixture;
 
@@ -32,4 +36,24 @@ public class ApplicationFactoryTest extends AbstractFactoryTest {
         assert null != app;
     }
 
+    @Test(groups = { "unittest" }, dependsOnMethods = { "testNewInstance" })
+    public void testSetChildNull() throws InstantiationException,
+            IllegalAccessException {
+        final FactoryBuilderSupport builder = createMockBuilder();
+        final Application app = (Application) fixture.newInstance(builder,
+                "application", null, new HashMap());
+        fixture.setChild(builder, app, null);
+        assert app.getRoot() == null;
+    }
+
+    @Test(groups = { "unittest" }, dependsOnMethods = { "testNewInstance" })
+    public void testSetChildRestlet() throws InstantiationException,
+            IllegalAccessException {
+        final FactoryBuilderSupport builder = createMockBuilder();
+        final Application app = (Application) fixture.newInstance(builder,
+                "application", null, new HashMap());
+        final Restlet child = new Restlet();
+        fixture.setChild(builder, app, child);
+        assert app.getRoot() == child;
+    }
 }

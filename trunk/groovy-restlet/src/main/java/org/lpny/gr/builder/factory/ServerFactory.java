@@ -15,7 +15,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Shortcut factory to create {@link Server}
+ * Shortcut factory to create {@link Server}.<br/>
+ * 
+ * <b>Attributes:</b>
+ * <ul>
+ * <li>protocol</li>
+ * <li>protocols</li>
+ * <li>address</li>
+ * <li>port</li>
+ * </ul>
  * 
  * @author keke
  * @reversion $Revision$
@@ -24,8 +32,13 @@ import org.slf4j.LoggerFactory;
 public class ServerFactory extends RestletFactory {
     private static final Logger LOG = LoggerFactory
             .getLogger(ServerFactory.class);
+    /**
+     * <b>Attribute</b>: The server address
+     */
     protected static final String ADDRESS = "address";
-
+    /**
+     * <b>Attribute</b>: The server port
+     */
     protected static final String PORT = "port";
 
     /**
@@ -35,11 +48,12 @@ public class ServerFactory extends RestletFactory {
         super();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected Object newInstanceInner(final FactoryBuilderSupport builder,
             final Object name, final Object value, final Map attributes)
             throws InstantiationException, IllegalAccessException {
-        final List<Protocol> protocols = ClientFactory.extractProtocols(value,
+        final List<Protocol> protocols = FactoryUtils.extractProtocols(value,
                 attributes);
         final String address = (String) attributes.remove(ADDRESS);
         final Integer port = (Integer) attributes.remove(PORT);

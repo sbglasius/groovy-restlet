@@ -10,13 +10,14 @@ import java.util.Map;
 import org.restlet.Redirector;
 
 /**
+ * Shortcut for creating {@link Redirector}.
+ * 
  * @author keke
- * @version
- * @since
+ * @version 0.1.0
+ * @since 0.1.0
  * @revision $Revision$
  */
 public class RedirectorFactory extends RestletFactory {
-    protected static final String TARGET = "target";
 
     public RedirectorFactory() {
         super();
@@ -26,7 +27,7 @@ public class RedirectorFactory extends RestletFactory {
     protected Object newInstanceInner(final FactoryBuilderSupport builder,
             final Object name, final Object value, final Map attributes)
             throws InstantiationException, IllegalAccessException {
-        return new Redirector(getRestletContext(builder), "");
+        return new Redirector(getRestletContext(builder), null);
     }
 
 }
