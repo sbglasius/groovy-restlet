@@ -40,5 +40,6 @@ Above variables can be directly referred in scripts.
 === `redirector` ===
 === `client` ===
 === `server` ===
+=== `filter` ===
 === `guard` ===
 === `resource` ===
