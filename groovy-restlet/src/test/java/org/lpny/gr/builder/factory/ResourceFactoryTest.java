@@ -58,6 +58,11 @@ public class ResourceFactoryTest extends AbstractFactoryTest {
             public Object call(final Object[] args) {
                 return new StringRepresentation("TEST");
             }
+
+            @Override
+            public Class[] getParameterTypes() {
+                return new Class[] { Variant.class };
+            }
         });
         final SpringFinder finder = (SpringFinder) fixture.newInstance(
                 mockBuilder, "resource", null, attributes);

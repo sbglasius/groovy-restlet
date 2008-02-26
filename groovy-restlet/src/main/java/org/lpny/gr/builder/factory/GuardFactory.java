@@ -16,7 +16,8 @@ import org.restlet.data.ChallengeScheme;
  * <h4>Important attributes</h4>
  * <ul>
  * <li><code>scheme</code>: specify the {@link ChallengeScheme} used to
- * create this {@link Guard}</li>
+ * create this {@link Guard}, if no scheme is specified, this factory will use
+ * <code>None</code> as default</li>
  * <li><code>realm</code>: specify the realm used to create this
  * {@link Guard}</li>
  * </ul>
@@ -27,7 +28,15 @@ import org.restlet.data.ChallengeScheme;
  * @see Guard#Guard(org.restlet.Context, ChallengeScheme, String)
  */
 public class GuardFactory extends RestletFactory {
-    protected static final String REALM  = "realm";
+    private static final ChallengeScheme NONE_SCHEME = ChallengeScheme
+            .valueOf("None");
+    /**
+     * <b>Attribute</b>: Guard Realm
+     */
+    protected static final String REALM = "realm";
+    /**
+     * <b>Attribute:</b> Guard challengeSchema
+     */
     protected static final String SCHEME = "scheme";
 
     /*
@@ -40,8 +49,11 @@ public class GuardFactory extends RestletFactory {
     protected Object newInstanceInner(final FactoryBuilderSupport builder,
             final Object name, final Object value, final Map attributes)
             throws InstantiationException, IllegalAccessException {
-        return new Guard(getRestletContext(builder),
-                (ChallengeScheme) attributes.remove(SCHEME),
+        ChallengeScheme schema = (ChallengeScheme) attributes.remove(SCHEME);
+        if (schema == null) {
+            schema = NONE_SCHEME;
+        }
+        return new Guard(getRestletContext(builder), schema,
                 (String) attributes.remove(REALM));
     }
 

@@ -32,14 +32,134 @@ import org.springframework.context.ApplicationContext;
  */
 public class SpringFinder extends Finder {
 
-    private static final Logger       LOG     = LoggerFactory
-                                                      .getLogger(SpringFinder.class);
+    private static class InnerResource extends Resource {
+        private final Map<String, Closure> methodHandlers;
+
+        public InnerResource(final Map<String, Closure> methodHandlers) {
+            super();
+            this.methodHandlers = methodHandlers;
+        }
+
+        @Override
+        public void acceptRepresentation(final Representation entity)
+                throws ResourceException {
+            final Closure closure = methodHandlers.get(ResourceFactory.ACCEPT);
+            if (closure == null) {
+                super.acceptRepresentation(entity);
+            } else {
+                closure.call(packArgs(this, closure, entity));
+            }
+        }
+
+        @Override
+        public void handleHead() {
+            final Closure closure = methodHandlers.get(ResourceFactory.HEAD);
+            if (closure == null) {
+                super.handleHead();
+            } else {
+                closure.call(packArgs(this, closure));
+            }
+        }
+
+        @Override
+        public void handleOptions() {
+            final Closure closure = methodHandlers.get(ResourceFactory.OPTIONS);
+            if (closure == null) {
+                super.handleOptions();
+            } else {
+                closure.call(packArgs(this, closure));
+            }
+        }
+
+        @Override
+        public void init(final Context context, final Request request,
+                final Response response) {
+            final Closure closure = methodHandlers.get(ResourceFactory.INIT);
+            super.init(context, request, response);
+            if (closure != null) {
+                closure
+                        .call(packArgs(this, closure, context, request,
+                                response));
+            }
+        }
+
+        @Override
+        public void removeRepresentations() throws ResourceException {
+            final Closure closure = methodHandlers.get(ResourceFactory.REMOVE);
+            if (closure == null) {
+                super.removeRepresentations();
+            } else {
+                closure.call(packArgs(this, closure));
+            }
+        }
+
+        @Override
+        public Representation represent() throws ResourceException {
+            final Closure closure = methodHandlers
+                    .get(ResourceFactory.REPRESENT);
+            if (closure != null) {
+                final Class<?>[] paramTypes = closure.getParameterTypes();
+                if (paramTypes.length == 1 && paramTypes[0] == Variant.class
+                        || paramTypes.length == 0) {
+                    return (Representation) closure
+                            .call(packArgs(this, closure));
+                }
+            }
+            return super.represent();
+        }
+
+        @Override
+        public Representation represent(final Variant variant)
+                throws ResourceException {
+            final Closure closure = methodHandlers
+                    .get(ResourceFactory.REPRESENT);
+            if (closure != null) {
+                final Class<?>[] paramTypes = closure.getParameterTypes();
+                if (paramTypes.length == 1 && paramTypes[0] == Variant.class
+                        || paramTypes.length == 2) {
+                    return (Representation) closure.call(packArgs(this,
+                            closure, variant));
+                }
+            }
+            return super.represent(variant);
+
+        }
+
+        @Override
+        public void storeRepresentation(final Representation entity)
+                throws ResourceException {
+            final Closure closure = methodHandlers.get(ResourceFactory.STORE);
+            if (closure == null) {
+                super.storeRepresentation(entity);
+            } else {
+                closure.call(packArgs(this, closure, entity));
+            }
+        }
+
+        private Object[] packArgs(final Object self, final Closure closure,
+                Object... args) {
+            if (args == null) {
+                args = new Object[0];
+            }
+            if (args.length == closure.getParameterTypes().length) {
+                return args;
+            } else {
+                final List<Object> newArgs = new ArrayList<Object>(Arrays
+                        .asList(args));
+                newArgs.add(self);
+                return newArgs.toArray();
+            }
+        }
+    }
+
+    private static final Logger LOG = LoggerFactory
+            .getLogger(SpringFinder.class);
 
     private static final List<String> METHODS = Arrays.asList(new String[] {
             ResourceFactory.REMOVE, ResourceFactory.STORE,
             ResourceFactory.HEAD, ResourceFactory.ACCEPT,
             ResourceFactory.OPTIONS, ResourceFactory.REPRESENT,
-            ResourceFactory.INIT             });
+            ResourceFactory.INIT });
 
     private static Object createInstance(final Class<?> beanClass,
             final Object[] args) throws SecurityException,
@@ -110,7 +230,7 @@ public class SpringFinder extends Finder {
     }
 
     @SuppressWarnings("unchecked")
-    private final Map                context;
+    private final Map context;
 
     private final ApplicationContext springContext;
 
@@ -121,7 +241,7 @@ public class SpringFinder extends Finder {
         this.context = context;
     }
 
-    private Handler postCreate(final Handler instance) {
+    private Handler createWithClosures() {
         final Map<String, Closure> methodHandlers = new HashMap<String, Closure>();
         for (final String method : METHODS) {
             final Closure methodHandler = (Closure) context.get(method);
@@ -140,129 +260,9 @@ public class SpringFinder extends Finder {
             }
         }
         if (methodHandlers.isEmpty()) {
-            return instance;
+            return new Resource();
         } else {
-            return new Resource() {
-                @Override
-                public void acceptRepresentation(final Representation entity)
-                        throws ResourceException {
-                    final Closure closure = methodHandlers
-                            .get(ResourceFactory.ACCEPT);
-                    if (closure == null) {
-                        super.acceptRepresentation(entity);
-                    } else {
-                        closure.call(packArgs(this, closure, entity));
-                    }
-                }
-
-                @Override
-                public void handleHead() {
-                    final Closure closure = methodHandlers
-                            .get(ResourceFactory.HEAD);
-                    if (closure == null) {
-                        super.handleHead();
-                    } else {
-                        closure.call(packArgs(this, closure));
-                    }
-                }
-
-                @Override
-                public void handleOptions() {
-                    final Closure closure = methodHandlers
-                            .get(ResourceFactory.OPTIONS);
-                    if (closure == null) {
-                        super.handleOptions();
-                    } else {
-                        closure.call(packArgs(this, closure));
-                    }
-                }
-
-                @Override
-                public void init(final Context context, final Request request,
-                        final Response response) {
-                    final Closure closure = methodHandlers
-                            .get(ResourceFactory.INIT);
-                    super.init(context, request, response);
-                    if (closure != null) {
-                        closure.call(packArgs(this, closure, context, request,
-                                response));
-                    }
-                }
-
-                @Override
-                public void removeRepresentations() throws ResourceException {
-                    final Closure closure = methodHandlers
-                            .get(ResourceFactory.REMOVE);
-                    if (closure == null) {
-                        super.removeRepresentations();
-                    } else {
-                        closure.call(packArgs(this, closure));
-                    }
-                }
-
-                @Override
-                public Representation represent() throws ResourceException {
-                    final Closure closure = methodHandlers
-                            .get(ResourceFactory.REPRESENT);
-                    if (closure != null) {
-                        final Class<?>[] paramTypes = closure
-                                .getParameterTypes();
-                        if (paramTypes.length == 1
-                                && paramTypes[0] == Variant.class
-                                || paramTypes.length == 0) {
-                            return (Representation) closure.call(packArgs(this,
-                                    closure));
-                        }
-                    }
-                    return super.represent();
-                }
-
-                @Override
-                public Representation represent(final Variant variant)
-                        throws ResourceException {
-                    final Closure closure = methodHandlers
-                            .get(ResourceFactory.REPRESENT);
-                    if (closure != null) {
-                        final Class<?>[] paramTypes = closure
-                                .getParameterTypes();
-                        if (paramTypes.length == 1
-                                && paramTypes[0] == Variant.class
-                                || paramTypes.length == 2) {
-                            return (Representation) closure.call(packArgs(this,
-                                    closure, variant));
-                        }
-                    }
-                    return super.represent(variant);
-
-                }
-
-                @Override
-                public void storeRepresentation(final Representation entity)
-                        throws ResourceException {
-                    final Closure closure = methodHandlers
-                            .get(ResourceFactory.STORE);
-                    if (closure == null) {
-                        super.storeRepresentation(entity);
-                    } else {
-                        closure.call(packArgs(this, closure, entity));
-                    }
-                }
-
-                private Object[] packArgs(final Object self,
-                        final Closure closure, Object... args) {
-                    if (args == null) {
-                        args = new Object[0];
-                    }
-                    if (args.length == closure.getParameterTypes().length) {
-                        return args;
-                    } else {
-                        final List<Object> newArgs = new ArrayList<Object>(
-                                Arrays.asList(args));
-                        newArgs.add(self);
-                        return newArgs.toArray();
-                    }
-                }
-            };
+            return new InnerResource(methodHandlers);
         }
     }
 
@@ -273,14 +273,7 @@ public class SpringFinder extends Finder {
             Handler handler = (Handler) createFromSpringContext(springContext,
                     context);
             if (handler == null) {
-                handler = new Resource();
-            }
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Handler: {}", handler);
-            }
-            handler = postCreate(handler);
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("To initialize Handler {}", handler);
+                handler = createWithClosures();
             }
             handler.init(getContext(), request, response);
             return handler;
@@ -288,5 +281,4 @@ public class SpringFinder extends Finder {
             throw new RuntimeException(e);
         }
     }
-
 }

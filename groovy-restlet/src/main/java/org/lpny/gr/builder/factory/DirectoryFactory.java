@@ -8,6 +8,7 @@ import groovy.util.FactoryBuilderSupport;
 import java.io.File;
 import java.util.Map;
 
+import org.apache.commons.lang.Validate;
 import org.restlet.Directory;
 
 /**
@@ -37,11 +38,13 @@ public class DirectoryFactory extends RestletFactory {
         // will try to get root value from attributes, if no root is defined
         // will try to use value as the root
         String root = (String) attributes.remove(ROOT);
+
         if (root == null) {
             if (value != null && value instanceof String) {
                 root = (String) value;
             }
         }
+        Validate.notNull(root, "Root should not be null");
         return new Directory(getRestletContext(builder), new File(root).toURI()
                 .toString());
     }
