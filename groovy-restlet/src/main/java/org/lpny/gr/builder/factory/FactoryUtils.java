@@ -3,10 +3,14 @@
  */
 package org.lpny.gr.builder.factory;
 
+import groovy.util.FactoryBuilderSupport;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.restlet.Context;
+import org.restlet.Restlet;
 import org.restlet.data.Protocol;
 
 /**
@@ -42,6 +46,15 @@ public class FactoryUtils {
             protocols.addAll(list);
         }
         return protocols;
+    }
+
+    protected static Context getParentRestletContext(
+            final FactoryBuilderSupport builder) {
+        Context context = null;
+        if (builder.getParentNode() instanceof Restlet) {
+            context = ((Restlet) builder.getParentNode()).getContext();
+        }
+        return context;
     }
 
 }

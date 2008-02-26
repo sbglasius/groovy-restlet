@@ -26,7 +26,7 @@ public class RouterFactory extends RestletFactory {
     protected Object newInstanceInner(final FactoryBuilderSupport builder,
             final Object name, final Object value, final Map attributes)
             throws InstantiationException, IllegalAccessException {
-        return new Router(getRestletContext(builder));
+        return new Router(FactoryUtils.getParentRestletContext(builder));
     }
 
 }

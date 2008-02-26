@@ -12,6 +12,8 @@ import org.apache.commons.lang.Validate;
 import org.restlet.Finder;
 import org.restlet.Router;
 import org.restlet.resource.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -32,12 +34,15 @@ import org.springframework.context.ApplicationContext;
  * @see Router
  */
 public class ResourceFactory extends AbstractFactory {
+    private static final Logger LOG = LoggerFactory
+            .getLogger(ResourceFactory.class);
     protected static final String ACCEPT = "accept";
     protected static final String HEAD = "head";
     protected static final String INIT = "init";
     protected static final String OPTIONS = "options";
     protected static final String REMOVE = "remove";
     protected static final String REPRESENT = "represent";
+
     protected static final String STORE = "store";
 
     /**
@@ -73,8 +78,9 @@ public class ResourceFactory extends AbstractFactory {
     protected Object newInstanceInner(final FactoryBuilderSupport builder,
             final Object name, final Object value, final Map attributes)
             throws InstantiationException, IllegalAccessException {
-        return new SpringFinder((ApplicationContext) builder
-                .getVariable(SPRING_CONTEXT), new HashMap(builder.getContext()));
+        return new SpringFinder(FactoryUtils.getParentRestletContext(builder),
+                (ApplicationContext) builder.getVariable(SPRING_CONTEXT),
+                new HashMap(builder.getContext()));
     }
 
     @Override
@@ -84,6 +90,10 @@ public class ResourceFactory extends AbstractFactory {
             final String uri = (String) builder.getContext().remove(URI);
             if (parent instanceof Router) {
                 final Router router = (Router) parent;
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("To attach {} to parent with uri={}",
+                            new Object[] { child, uri });
+                }
                 if (uri == null) {
                     return router.attachDefault((Finder) child);
                 } else {

@@ -57,7 +57,7 @@ public class ServerFactory extends RestletFactory {
                 attributes);
         final String address = (String) attributes.remove(ADDRESS);
         final Integer port = (Integer) attributes.remove(PORT);
-        return new Server(getRestletContext(builder), protocols, address, port,
+        return new Server(FactoryUtils.getParentRestletContext(builder), protocols, address, port,
                 null);
     }
 

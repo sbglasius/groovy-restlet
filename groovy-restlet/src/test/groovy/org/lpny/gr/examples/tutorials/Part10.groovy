@@ -1,6 +1,6 @@
 package org.lpny.gr.examples.tutorials
 
-builder.component{
+def com = builder.component{
     current.servers.add(protocol.HTTP, 8182)
     application(uri:""){
         def router = router{
@@ -12,9 +12,12 @@ builder.component{
             })
         }        
     }
-}.start()
+}
+com.start()
 
 def client = builder.client(protocol.HTTP)
 def resp = client.get("http://localhost:8182/search?kwd=Restlet")
 assert resp.status == status.REDIRECTION_TEMPORARY
 assert resp.locationRef.toString().equals("http://www.google.com/search?q=Restlet") : "Location ${resp.locationRef.toString()}"
+
+com.stop()

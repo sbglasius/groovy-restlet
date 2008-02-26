@@ -53,7 +53,7 @@ public class GuardFactory extends RestletFactory {
         if (schema == null) {
             schema = NONE_SCHEME;
         }
-        return new Guard(getRestletContext(builder), schema,
+        return new Guard(FactoryUtils.getParentRestletContext(builder), schema,
                 (String) attributes.remove(REALM));
     }
 

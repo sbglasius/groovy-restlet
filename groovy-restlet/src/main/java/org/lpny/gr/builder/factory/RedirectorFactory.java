@@ -27,7 +27,7 @@ public class RedirectorFactory extends RestletFactory {
     protected Object newInstanceInner(final FactoryBuilderSupport builder,
             final Object name, final Object value, final Map attributes)
             throws InstantiationException, IllegalAccessException {
-        return new Redirector(getRestletContext(builder), null);
+        return new Redirector(FactoryUtils.getParentRestletContext(builder), null);
     }
 
 }
