@@ -9,6 +9,7 @@ import groovy.lang.GroovyShell;
 import java.io.File;
 import java.net.URI;
 
+import org.lpny.gr.builder.Global;
 import org.lpny.gr.builder.RestletBuilder;
 import org.restlet.Redirector;
 import org.restlet.Router;
@@ -65,14 +66,15 @@ public class GroovyRestlet {
 
     private void declareShellContext() {
         final Binding context = shell.getContext();
+        final Global global = new Global();
         context.setVariable("builder", builder);
+        context.setVariable("global", global);
         context.setVariable("protocol", Protocol.class);
         context.setVariable("mediaType", MediaType.class);
         context.setVariable("springContext", springContext);
         context.setVariable("status", Status.class);
         context.setVariable("challengeScheme", ChallengeScheme.class);
         context.setVariable("redirectorMode", Redirector.class);
-        // router modes
         context.setVariable("routingMode", Router.class);
     }
 }

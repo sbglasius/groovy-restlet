@@ -28,7 +28,8 @@ import org.slf4j.LoggerFactory;
  * @see <a href="http://groovy.codehaus.org/GroovyMarkup">Groovy Markup</a>
  */
 public class RestletBuilder extends FactoryBuilderSupport {
-    private static final Logger LOG = LoggerFactory.getLogger(RestletBuilder.class);
+    private static final Logger LOG = LoggerFactory
+                                            .getLogger(RestletBuilder.class);
 
     public RestletBuilder() {
         super();
