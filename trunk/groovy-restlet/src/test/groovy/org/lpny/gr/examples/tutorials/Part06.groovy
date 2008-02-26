@@ -15,3 +15,5 @@ def client = builder.client(protocol.HTTP)
 def resp = client.get("http://localhost:8182/pom.xml")
 assert resp != null
 assert resp.status == status.SUCCESS_OK : "Status=${resp.status}"
+
+component.stop()

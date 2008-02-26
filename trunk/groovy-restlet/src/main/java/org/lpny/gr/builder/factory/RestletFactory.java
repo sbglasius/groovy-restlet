@@ -16,7 +16,6 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.InvocationHandler;
 
 import org.restlet.Component;
-import org.restlet.Context;
 import org.restlet.Guard;
 import org.restlet.Restlet;
 import org.restlet.Router;
@@ -68,14 +67,6 @@ public class RestletFactory extends AbstractFactory {
         addFilter(HANDLE);
     }
 
-    protected Context getRestletContext(final FactoryBuilderSupport builder) {
-        Context context = null;
-        if (builder.getParentNode() instanceof Restlet) {
-            context = ((Restlet) builder.getParentNode()).getContext();
-        }
-        return context;
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -87,7 +78,7 @@ public class RestletFactory extends AbstractFactory {
     protected Object newInstanceInner(final FactoryBuilderSupport builder,
             final Object name, final Object value, final Map attributes)
             throws InstantiationException, IllegalAccessException {
-        return new Restlet(getRestletContext(builder));
+        return new Restlet(FactoryUtils.getParentRestletContext(builder));
     }
 
     @SuppressWarnings("unchecked")

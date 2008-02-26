@@ -45,7 +45,7 @@ public class DirectoryFactory extends RestletFactory {
             }
         }
         Validate.notNull(root, "Root should not be null");
-        return new Directory(getRestletContext(builder), new File(root).toURI()
+        return new Directory(FactoryUtils.getParentRestletContext(builder), new File(root).toURI()
                 .toString());
     }
 

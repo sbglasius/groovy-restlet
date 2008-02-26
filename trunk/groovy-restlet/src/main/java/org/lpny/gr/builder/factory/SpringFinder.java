@@ -23,6 +23,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -224,7 +225,9 @@ public class SpringFinder extends Finder {
             return springContext == null ? createInstance(beanClass,
                     (Object[]) context.get(AbstractFactory.CONS_ARG))
                     : springContext.getAutowireCapableBeanFactory().createBean(
-                            beanClass);
+                            beanClass,
+                            AutowireCapableBeanFactory.AUTOWIRE_AUTODETECT,
+                            false);
         }
         return null;
     }
@@ -235,8 +238,9 @@ public class SpringFinder extends Finder {
     private final ApplicationContext springContext;
 
     @SuppressWarnings("unchecked")
-    public SpringFinder(final ApplicationContext springContext,
-            final Map context) {
+    public SpringFinder(final Context restletContext,
+            final ApplicationContext springContext, final Map context) {
+        super(restletContext);
         this.springContext = springContext;
         this.context = context;
     }

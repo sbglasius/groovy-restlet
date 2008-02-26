@@ -15,3 +15,4 @@ server.start();
 def client = builder.client(protocol:protocol.HTTP)
 assert "Hello World" == client.get("http://localhost:8182").getEntity().getText()
 
+server.stop()

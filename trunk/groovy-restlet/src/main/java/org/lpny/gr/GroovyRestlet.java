@@ -9,7 +9,7 @@ import groovy.lang.GroovyShell;
 import java.io.File;
 import java.net.URI;
 
-import org.lpny.gr.builder.Builder;
+import org.lpny.gr.builder.RestletBuilder;
 import org.restlet.Redirector;
 import org.restlet.Router;
 import org.restlet.data.ChallengeScheme;
@@ -25,24 +25,24 @@ import org.springframework.context.ApplicationContext;
  * @reversion $Revision$
  * @since 0.1.0
  */
-public class Constructor {
+public class GroovyRestlet {
     private static final Logger LOG = LoggerFactory
-            .getLogger(Constructor.class);
-    private final Builder builder;
+            .getLogger(GroovyRestlet.class);
+    private final RestletBuilder builder;
     private final GroovyShell shell;
     private final ApplicationContext springContext;
 
-    public Constructor() {
+    public GroovyRestlet() {
         this(null);
     }
 
-    public Constructor(final ApplicationContext springContext) {
+    public GroovyRestlet(final ApplicationContext springContext) {
         super();
         this.springContext = springContext;
         shell = new GroovyShell(Thread.currentThread().getContextClassLoader());
-        builder = new Builder();
+        builder = new RestletBuilder();
         builder.setVariable("springContext", springContext);
-        // expose shell variables
+        // declare shell variables
         declareShellContext();
     }
 

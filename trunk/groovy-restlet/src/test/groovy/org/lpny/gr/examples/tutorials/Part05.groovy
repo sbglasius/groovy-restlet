@@ -23,3 +23,5 @@ Root URI : http://localhost:8182/trace
 Routed part : http://localhost:8182/trace
 Remaining part: /abc/def?param=123"""
 assert text == expected
+
+component.stop()

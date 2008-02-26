@@ -5,7 +5,7 @@ package org.lpny.gr.example.tutorial;
 
 import java.io.File;
 
-import org.lpny.gr.Constructor;
+import org.lpny.gr.GroovyRestlet;
 import org.restlet.Client;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -26,7 +26,7 @@ public class ExampleRunner {
 
     }
 
-    private Constructor fixture;
+    private GroovyRestlet fixture;
 
     @Test(groups = { "examples" })
     public void runPart02() {
@@ -78,7 +78,7 @@ public class ExampleRunner {
 
     @BeforeClass(groups = { "examples" })
     public void setup() {
-        fixture = new Constructor();
+        fixture = new GroovyRestlet();
     }
 
 }

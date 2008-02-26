@@ -1,6 +1,6 @@
 package org.lpny.gr.examples.tutorials
 
-builder.component{
+def com = builder.component{
     current.servers.add(protocol.HTTP, 8182)
     
     application(uri:""){
@@ -27,7 +27,8 @@ builder.component{
             })
         }
     }
-}.start()
+}
+com.start()
 
 def client = builder.client(protocol:protocol.HTTP)
 def resp = client.get("http://localhost:8182/docs/pom.xml")
@@ -43,3 +44,5 @@ println resp.entity.text
 resp = client.get("http://localhost:8182/users/test/orders/restlet")
 assert resp.status == status.SUCCESS_OK
 println resp.entity.text
+
+com.stop()

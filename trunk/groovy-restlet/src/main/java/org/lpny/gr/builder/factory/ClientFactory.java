@@ -54,7 +54,7 @@ public class ClientFactory extends RestletFactory {
             throws InstantiationException, IllegalAccessException {
         final List<Protocol> protocols = FactoryUtils.extractProtocols(value,
                 attributes);
-        return new Client(getRestletContext(builder), protocols);
+        return new Client(FactoryUtils.getParentRestletContext(builder), protocols);
     }
 
 }
