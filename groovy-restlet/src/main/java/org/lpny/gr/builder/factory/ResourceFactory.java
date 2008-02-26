@@ -34,16 +34,16 @@ import org.springframework.context.ApplicationContext;
  * @see Router
  */
 public class ResourceFactory extends AbstractFactory {
-    private static final Logger LOG = LoggerFactory
-            .getLogger(ResourceFactory.class);
-    protected static final String ACCEPT = "accept";
-    protected static final String HEAD = "head";
-    protected static final String INIT = "init";
-    protected static final String OPTIONS = "options";
-    protected static final String REMOVE = "remove";
+    private static final Logger   LOG       = LoggerFactory
+                                                    .getLogger(ResourceFactory.class);
+    protected static final String ACCEPT    = "accept";
+    protected static final String HEAD      = "head";
+    protected static final String INIT      = "init";
+    protected static final String OPTIONS   = "options";
+    protected static final String REMOVE    = "remove";
     protected static final String REPRESENT = "represent";
 
-    protected static final String STORE = "store";
+    protected static final String STORE     = "store";
 
     /**
      * Constructor.
@@ -59,6 +59,7 @@ public class ResourceFactory extends AbstractFactory {
         return true;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object newInstance(final FactoryBuilderSupport builder,
             final Object name, final Object value, final Map attributes)
@@ -74,6 +75,7 @@ public class ResourceFactory extends AbstractFactory {
      * @see org.lpny.gr.builder.factory.AbstractFactory#newInstanceInner(groovy.util.FactoryBuilderSupport,
      *      java.lang.Object, java.lang.Object, java.util.Map)
      */
+    @SuppressWarnings("unchecked")
     @Override
     protected Object newInstanceInner(final FactoryBuilderSupport builder,
             final Object name, final Object value, final Map attributes)

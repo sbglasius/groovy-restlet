@@ -5,7 +5,6 @@ package org.lpny.gr.builder.factory;
 
 import groovy.lang.Closure;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,7 +22,6 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -153,89 +151,19 @@ public class SpringFinder extends Finder {
         }
     }
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(SpringFinder.class);
-
     private static final List<String> METHODS = Arrays.asList(new String[] {
             ResourceFactory.REMOVE, ResourceFactory.STORE,
             ResourceFactory.HEAD, ResourceFactory.ACCEPT,
             ResourceFactory.OPTIONS, ResourceFactory.REPRESENT,
-            ResourceFactory.INIT });
+            ResourceFactory.INIT             });
 
-    private static Object createInstance(final Class<?> beanClass,
-            final Object[] args) throws SecurityException,
-            IllegalArgumentException, InstantiationException,
-            IllegalAccessException {
-        Class<?>[] types = null;
-        if (args != null) {
-            types = new Class<?>[args.length];
-            for (int i = 0; i < args.length; i++) {
-                types[i] = args[i].getClass();
-            }
-            try {
-                final Constructor<?> cons = beanClass.getConstructor(types);
-                return cons.newInstance(args);
-            } catch (final Exception e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            return beanClass.newInstance();
-        }
-
-    }
+    static final Logger               LOG     = LoggerFactory
+                                                      .getLogger(SpringFinder.class);
 
     @SuppressWarnings("unchecked")
-    static Object createFromSpringContext(
-            final ApplicationContext springContext, final Map context)
-            throws InstantiationException, IllegalAccessException {
-        if (context.containsKey(AbstractFactory.OF_BEAN)) {
-            if (springContext == null) {
-                throw new RuntimeException(
-                        "No Spring Context was specified, \"ofBean\" is not supported! ");
-            }
-            final String beanName = (String) context
-                    .get(AbstractFactory.OF_BEAN);
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("To create instance by beanName {}", beanName);
-            }
-            return springContext.getBean(beanName);
-        }
-        // if user defines ofClass attribute, factory will first try to
-        // check
-        // whether user specifies springContext, if so factory will try
-        // to
-        // create bean using spring autowire bean factory
-        // otherwise will use class.newInstance
-        if (context.containsKey(AbstractFactory.OF_CLASS)) {
-            final Object ofClazz = context.get(AbstractFactory.OF_CLASS);
-            Class<?> beanClass;
-            if (ofClazz.getClass().equals(String.class)) {
-                try {
-                    beanClass = Class.forName((String) ofClazz);
-                } catch (final ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-            } else if (ofClazz.getClass().equals(Class.class)) {
-                beanClass = (Class<?>) ofClazz;
-            } else {
-                throw new IllegalArgumentException("Illegal ofClass type "
-                        + ofClazz);
-            }
+    private final Map                 context;
 
-            return springContext == null ? createInstance(beanClass,
-                    (Object[]) context.get(AbstractFactory.CONS_ARG))
-                    : springContext.getAutowireCapableBeanFactory().createBean(
-                            beanClass,
-                            AutowireCapableBeanFactory.AUTOWIRE_AUTODETECT,
-                            false);
-        }
-        return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    private final Map context;
-
-    private final ApplicationContext springContext;
+    private final ApplicationContext  springContext;
 
     @SuppressWarnings("unchecked")
     public SpringFinder(final Context restletContext,
@@ -274,8 +202,8 @@ public class SpringFinder extends Finder {
     protected Handler createTarget(final Request request,
             final Response response) {
         try {
-            Handler handler = (Handler) createFromSpringContext(springContext,
-                    context);
+            Handler handler = (Handler) FactoryUtils.createFromSpringContext(
+                    springContext, context);
             if (handler == null) {
                 handler = createWithClosures();
             }
