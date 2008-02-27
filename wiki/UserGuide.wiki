@@ -1,5 +1,5 @@
 #summary Detail User Guide
-#labels User-Guide
+#labels User-Guide,Featured
 
 == Everything starts from `GroovyRestlet` ==
 In order to using this Groovy DSL to construct Restlet application, you must first create an instance of `GroovyRestlet`.
