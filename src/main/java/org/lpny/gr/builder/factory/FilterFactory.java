@@ -5,12 +5,11 @@ package org.lpny.gr.builder.factory;
 
 import groovy.lang.Closure;
 import groovy.util.FactoryBuilderSupport;
-
-import java.util.Map;
-
 import org.restlet.Filter;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+
+import java.util.Map;
 
 /**
  * @author keke
@@ -43,14 +42,15 @@ public class FilterFactory extends RestletFactory {
             }
 
             @Override
-            protected void beforeHandle(final Request request,
+            protected int beforeHandle(final Request request,
                     final Response response) {
                 if (before != null) {
-                    before.call(FactoryUtils.packArgs(this, before, request,
+                    return (int)before.call(FactoryUtils.packArgs(this, before, request,
                             response));
                 } else {
-                    super.beforeHandle(request, response);
+                    return super.beforeHandle(request, response);
                 }
+
             }
 
         };

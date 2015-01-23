@@ -1,0 +1,49 @@
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'idea'
+
+group = 'groovy-restlet'
+version = '0.4.0-SNAPSHOT'
+
+description = """groovy-restlet"""
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+
+
+repositories {
+        
+     maven { url "http://maven.restlet.org" }
+     maven { url "http://repo.maven.apache.org/maven2" }
+}
+dependencies {
+    compile group: 'org.restlet', name: 'org.restlet', version:'1.1.10'
+    compile(group: 'org.springframework', name: 'spring-context', version:'4.1.4.RELEASE') {
+        exclude(module: 'commons-logging')
+    }
+    compile group: 'org.slf4j', name: 'slf4j-api', version:'1.4.3'
+    compile(group: 'org.codehaus.groovy', name: 'groovy-all', version:'2.3.9') {
+        exclude(module: 'junit')
+    }
+    compile group: 'cglib', name: 'cglib-nodep', version:'3.1'
+    compile group: 'commons-lang', name: 'commons-lang', version:'2.3'
+    runtime group: 'com.noelios.restlet', name: 'com.noelios.restlet', version:'1.1.10'
+    runtime(group: 'com.noelios.restlet', name: 'com.noelios.restlet.ext.httpclient', version:'1.1.10') {
+        exclude(module: 'commons-logging')
+    }
+    runtime group: 'com.noelios.restlet', name: 'com.noelios.restlet.ext.jetty', version:'1.1.10'
+    runtime group: 'org.slf4j', name: 'jcl104-over-slf4j', version:'1.4.3'
+    runtime group: 'org.slf4j', name: 'slf4j-log4j12', version:'1.4.3'
+    runtime group: 'log4j', name: 'log4j', version:'1.2.14'
+    testCompile group: 'org.testng', name: 'testng', version:'6.8.8'
+    testCompile group: 'org.easymock', name: 'easymock', version:'3.3.1'
+    testCompile(group: 'org.springframework', name: 'spring-test', version:'4.1.4.RELEASE') {
+        exclude(module: 'commons-logging')
+    }
+}
+
+test {
+    useTestNG()
+}
